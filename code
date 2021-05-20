@@ -1,0 +1,73 @@
+```
+
+#include <Wire.h>
+#include <SparkFunCCS811.h>
+#include <LiquidCrystal_I2C.h>
+// Wiring: SDA pin is connected to A4 and SCL pin to A5.
+// Connect to LCD via I2C, default address 0x27 (A0-A2 not jumpered)
+LiquidCrystal_I2C lcd = LiquidCrystal_I2C(0x20, 16, 2); // Address is 0x20,16 chars x 2 lines)
+
+#define CCS811_ADDR 0x5B //Default I2C Address
+//#define CCS811_ADDR 0x5A //Alternate I2C Address
+
+CCS811 myCCS811(CCS811_ADDR);
+int redPin = 9;
+int greenPin = 10;
+int bluePin = 11;
+void setup() {
+  // put your setup code here, to run once:
+  Wire.begin();
+  Serial.begin(115200);
+  myCCS811.begin();
+  lcd.init();
+  lcd.backlight();
+  pinMode(redPin, OUTPUT);
+  pinMode(greenPin, OUTPUT);
+  pinMode(bluePin, OUTPUT);
+}
+void loop() {
+  if (myCCS811.dataAvailable())
+  {
+    Serial.print ("Data tempCO2= ");
+    myCCS811.readAlgorithmResults();
+    int tempCO2 = myCCS811.getCO2();
+    int tempVOC = myCCS811.getTVOC();
+    Serial.print (tempCO2);
+    Serial.print ("- Data tempTVOC= ");
+    Serial.println (tempVOC);
+    lcd.setCursor(0, 0); // Set the cursor on the 1st column and first row.
+    lcd.print("tempCO2 = "); lcd.print(tempCO2);  lcd.print("   ");// Print the string "Hello World!"
+    lcd.setCursor(0, 1); //Set the cursor on the first column and the second row (counting starts at 0!).
+    lcd.print("tempTVOC = "); lcd.print(tempVOC); lcd.print("   ");
+
+  }
+  else if (myCCS811.checkForStatusError())
+  {
+   
+    Serial.print ("Data niet beschikbaar");
+    lcd.setCursor(0, 0); // Set the cursor on the 1st column and first row.
+    lcd.print("Data niet beschikbaar");
+            }
+if(CCS811.dataAvailable==>1100)
+{
+setColor(255, 0, 0);  // red
+}
+if(CCS811.dataAvailable<800)
+{
+setColor(0, 255, 0);//green  
+}
+if(CCS811.dataAvailable==>800)
+{
+setColor(255, 50, 0);//orange 
+}
+              delay(2000); //Wait for next reading
+            }   
+
+void setColor(int red, int green, int blue)
+{
+  analogWrite(redPin, red);
+  analogWrite(greenPin, green);
+  analogWrite(bluePin, blue);  
+}
+
+´´´
